@@ -1,0 +1,71 @@
+---
+- name: Install Redis
+  hosts: client
+  vars:
+    redis_port: 6379
+    redis_databases: 1
+  tasks:
+    - name: Install redis
+      dnf:
+        name: redis
+        state: latest      
+
+    - name: Ensure Redis is started
+      service: 
+        name: redis
+        state: started 
+        enabled: yes
+            
+      
+    - name: change config file
+      lineinfile:
+        path: '/etc/redis.conf'
+        regex: '^masterauth'
+        line: "masterauth  admin123"
+      notify: Redis Restart  
+        
+        
+    - name: change config file
+      lineinfile:
+        path: '/etc/redis.conf'
+        regex: '^replicaof'
+        line: "replicaof 172.31.95.240 6379"
+      notify: Redis Restart   
+
+
+    - name: chnage config file
+      lineinfile:
+        path: '/etc/redis.conf'
+        regex: '^slaveof'
+        line: "slaveof 172.31.95.240 6379"
+      notify: Redis Restart   
+          
+    - name: Bind redis to 172.31.82.124
+      lineinfile:
+        dest: '/etc/redis.conf'
+        regexp: '^bind'
+        line: 'bind 127.0.0.1 172.31.82.124 '
+        state: present
+      notify: Redis Restart
+
+    - name: slave of cmd 1
+      shell:
+        cmd: redis-cli   SLAVEOF NO ONE
+  
+    
+
+    - name: slave of cmd 2
+      shell:
+        cmd: redis-cli SLAVEOF 172.31.95.240 6379
+
+     
+  
+       
+  handlers:
+
+    - name: Redis Restart
+      service: 
+        name: redis 
+        state: restarted 
+        enabled: yes
+        sudo: true
