@@ -1,6 +1,6 @@
 ---
 - name: Install Redis
-  hosts: master
+  hosts: localhost
   vars:
     redis_port: 6379
     redis_databases: 1
@@ -66,11 +66,11 @@
         line: "logfile  /var/log/redis/redis.log"
       notify: Redis Restart    
           
-    - name: Bind redis to 172.31.95.240
+    - name: Bind redis to 172.31.89.158
       lineinfile:
         dest: '/etc/redis.conf'
         regexp: '^bind'
-        line: 'bind 127.0.0.1 172.31.95.240'
+        line: 'bind 127.0.0.1 172.31.89.158'
         state: present
       notify: Redis Restart
        
