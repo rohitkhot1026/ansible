@@ -1,7 +1,0 @@
-- name: Install Redis
-  hosts: localhost
-  tasks:
-    - name: Remove redis
-      dnf:
-        name: redis
-        state: absent
